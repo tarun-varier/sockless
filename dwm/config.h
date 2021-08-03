@@ -2,7 +2,7 @@
 
 #include <X11/XF86keysym.h>
 
-#define TERMINAL "kitty"
+#define TERMINAL "alacritty"
 /* #define TERMCLASS "Kitty" */
 
 /* appearance */
@@ -36,7 +36,7 @@ static const Rule rules[] = {
   { "Gimp",           NULL,             NULL,       0,              0,           1,           -1 },
   { "Brave-browser",  NULL,             NULL,       1 << 0,         0,           0,           -1 },
   { "Zathura",        NULL,             NULL,       1 << 1,         0,           0,           -1 },
-  { "kitty",          NULL,             NULL,       1 << 2,         0,           0,           -1 },
+  { "Alacritty",      NULL,             NULL,       1 << 2,         0,           0,           -1 },
   { "Emacs",          NULL,             NULL,       1 << 3,         0,           0,           -1 },
   { "Rust",           NULL,             NULL,       0,              1,           1,           -1 },
 };
@@ -73,7 +73,7 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *brave[]        = { "brave", "--profile-directory", NULL };
 static const char *dmenucmd[]       = { "dmenu_run", NULL };
-static const char *termcmd[]        = { "kitty", NULL };
+static const char *termcmd[]        = { "alacritty", NULL };
 
 static Key keys[] = {
 	/* modifier                     key           function        argument */
@@ -87,7 +87,7 @@ static Key keys[] = {
     { MODKEY,                       XK_w,         spawn,          {.v = brave } },
     { MODKEY,                       XK_Return,    spawn,          {.v = termcmd } },
     { MODKEY,                       XK_s,         spawn,          SHCMD("spotify") },
-    { MODKEY,                       XK_r,         spawn,          SHCMD("kitty -e lf") },
+    { MODKEY,                       XK_r,         spawn,          SHCMD("alacritty -e lf") },
     { MODKEY,                       XK_y,         spawn,          SHCMD("zathura /home/tarun/dl/school/11/time_table.pdf") },
     { MODKEY,                       XK_n,         spawn,          SHCMD(TERMINAL " -e nvim") },
     { MODKEY,                       XK_b,         togglebar,      {0} },
