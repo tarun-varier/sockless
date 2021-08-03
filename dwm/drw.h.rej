@@ -1,11 +1,11 @@
---- drw.h	2015-11-28 15:39:44.427726312 -0700
-+++ drw.h	2015-11-08 15:39:37.000000000 -0700
-@@ -67,8 +67,6 @@ void drw_setfont(Drw *, Fnt *);
- void drw_setscheme(Drw *, ClrScheme *);
+--- drw.h
++++ drw.h
+@@ -39,7 +39,7 @@ void drw_font_getexts(Fnt *font, const char *text, unsigned int len, unsigned in
  
- /* Drawing functions */
--int drw_get_width(Drw *, int, const char *);
--void drw_colored_text(Drw *, ClrScheme *, int, int, int, unsigned int, unsigned int, char *);
- void drw_rect(Drw *, int, int, unsigned int, unsigned int, int, int, int);
- int drw_text(Drw *, int, int, unsigned int, unsigned int, const char *, int);
+ /* Colorscheme abstraction */
+ void drw_clr_create(Drw *drw, Clr *dest, const char *clrname);
+-Clr *drw_scm_create(Drw *drw, const char *clrnames[], size_t clrcount);
++Clr *drw_scm_create(Drw *drw, char *clrnames[], size_t clrcount);
  
+ /* Cursor abstraction */
+ Cur *drw_cur_create(Drw *drw, int shape);

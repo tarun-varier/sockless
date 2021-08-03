@@ -3,25 +3,35 @@
 #include <X11/XF86keysym.h>
 
 #define TERMINAL "alacritty"
-/* #define TERMCLASS "Kitty" */
 
 /* appearance */
-static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int gappx     = 5;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "Cascadia Code:size=10", "Mononoki Nerd Font:size=10" };
-/* static const char dmenufont[]       = "monospace:size=10"; */
-static const char col_gray1[]       = "#000000";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#000000";
-static const char col_cyan[]        = "#92E5CF";
-static const char *colors[][3]      = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_cyan,  col_gray4,  col_cyan  },
+static const char *fonts[]          = { "JetBrainsMonoMedium Nerd Font:size=10" };
+static const char dmenufont[]       = "JetBrainsMonoMedium Nerd Font:size=10";
+static char normbgcolor[]           = "#222222";
+static char normbordercolor[]       = "#444444";
+static char normfgcolor[]           = "#bbbbbb";
+static char selfgcolor[]            = "#eeeeee";
+static char selbordercolor[]        = "#005577";
+static char selbgcolor[]            = "#005577";
+static char *colors[][3] = {
+       /*               fg           bg           border   */
+       [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
+       [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
+};
+
+typedef struct {
+	const char *name;
+	const void *cmd;
+} Sp;
+const char *spcmd1[] = {"pomotroid", NULL };
+static Sp scratchpads[] = {
+	/* name          cmd  */
+	{"pomotroid",    spcmd1},
 };
 
 /* tagging */
@@ -32,13 +42,14 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class          instance          title      tags mask        iscentered   isfloating   monitor */
-  { "Gimp",           NULL,             NULL,       0,              0,           1,           -1 },
-  { "Brave-browser",  NULL,             NULL,       1 << 0,         0,           0,           -1 },
-  { "Zathura",        NULL,             NULL,       1 << 1,         0,           0,           -1 },
-  { "Alacritty",      NULL,             NULL,       1 << 2,         0,           0,           -1 },
-  { "Emacs",          NULL,             NULL,       1 << 3,         0,           0,           -1 },
-  { "Rust",           NULL,             NULL,       0,              1,           1,           -1 },
+	/* class          instance          title      tags mask        switchtotag     iscentered   isfloating   monitor */
+  { "Gimp",           NULL,             NULL,       0,              0,              0,           1,           -1 },
+  { "Brave-browser",  NULL,             NULL,       1 << 0,         1,              0,           0,           -1 },
+  { "Zathura",        NULL,             NULL,       1 << 1,         1,              0,           0,           -1 },
+  { "Alacritty",      NULL,             NULL,       1 << 2,         1,              0,           0,           -1 },
+  { "Emacs",          NULL,             NULL,       1 << 3,         1,              0,           0,           -1 },
+  { "Tk",             NULL,             NULL,       0,              0,              1,           1,           -1 },
+  { NULL,		      "pomotroid",	    NULL,		SPTAG(0),		0,			    0,           0,           -1 },
 };
 
 /* layout(s) */
@@ -71,9 +82,10 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *brave[]        = { "brave", "--profile-directory", NULL };
-static const char *dmenucmd[]       = { "dmenu_run", NULL };
+static const char *brave[]          = { "brave", NULL };
+static const char *dmenucmd[]       = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]        = { "alacritty", NULL };
+
 
 static Key keys[] = {
 	/* modifier                     key           function        argument */
@@ -93,16 +105,19 @@ static Key keys[] = {
     { MODKEY,                       XK_b,         togglebar,      {0} },
     { MODKEY,                       XK_e,         spawn,          SHCMD("emacs") },
     { MODKEY,                       XK_x,         spawn,          SHCMD("notify-send \"$(xprop | grep WM_CLASS)\"") },
+	{ MODKEY,            			XK_p,  	      togglescratch,  {.ui = 0 } },
+	{ MODKEY,            			XK_c,  	      spawn,          SHCMD("clipmenu") },
     { MODKEY|ShiftMask,             XK_p,         spawn,          SHCMD("passmenu2") },
     { MODKEY|ShiftMask,             XK_a,         spawn,          SHCMD("add-bm-dir") },
     { MODKEY|ShiftMask,             XK_m,         spawn,          SHCMD("medicine-alarm") },
+    { MODKEY|ShiftMask,             XK_b,         spawn,          SHCMD("echo 'JetBrainsMonoMedium Nerd Font' | xclip -sel clip") },
     /* Layouts */
 	{ MODKEY,                       XK_t,         setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_f,         setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                       XK_m,         setlayout,      {.v = &layouts[3]} },
 	{ MODKEY,                       XK_u,         setlayout,      {.v = &layouts[0]} },
 	{ MODKEY,                       XK_o,         setlayout,      {.v = &layouts[4]} },
-	{ MODKEY,                       XK_c,         setlayout,      {.v = &layouts[5]} },
+	{ MODKEY,                       XK_z,         setlayout,      {.v = &layouts[5]} },
     { MODKEY|ShiftMask,             XK_l,         spawn,          SHCMD("listlayouts") },
 	{ MODKEY,                       XK_j,         focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,         focusstack,     {.i = -1 } },
@@ -123,15 +138,14 @@ static Key keys[] = {
 	{ MODKEY,                       XK_minus,     setgaps,        {.i = -1 } },
 	{ MODKEY,                       XK_equal,     setgaps,        {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_equal,     setgaps,        {.i = 0  } },
-    /* bunch of XF86 keys cos i got a bunch of em */
+    /* bunch of XF86 keys coz i got a bunch of em */
 	{ 0,                            XF86XK_AudioLowerVolume, spawn, SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof dwmblocks);") },
 	{ 0,                            XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -36 $(pidof dwmblocks)") },
 	{ 0,                            XF86XK_AudioRaiseVolume, spawn, SHCMD("pamixer --allow-boost -i 5; kill -36 $(pidof dwmblocks)") },
 	{ 0,                            XF86XK_MonBrightnessUp, spawn, SHCMD("xbacklight -inc 5") },
 	{ 0,                            XF86XK_MonBrightnessDown, spawn, SHCMD("xbacklight -dec 5") },
 	{ 0,                            XK_Print, spawn, SHCMD("flameshot gui") },
-    /* struggling to make the stuff below into a function that appends to the list but
-     * i am bad at C */
+	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -159,7 +173,7 @@ static Button buttons[] = {
 	{ ClkStatusText,        MODKEY,         Button1,        sigstatusbar,   {.i = 6} },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
 	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
+	{ ClkClientWin,         MODKEY,         Button1,        resizemouse,    {0} },
 	{ ClkTagBar,            0,              Button1,        view,           {0} },
 	{ ClkTagBar,            0,              Button3,        toggleview,     {0} },
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },

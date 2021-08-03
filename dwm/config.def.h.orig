@@ -3,7 +3,6 @@
 #include <X11/XF86keysym.h>
 
 #define TERMINAL "alacritty"
-/* #define TERMCLASS "Kitty" */
 
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
@@ -11,17 +10,18 @@ static const unsigned int gappx     = 5;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
-static const char *fonts[]          = { "Cascadia Code:size=10", "Mononoki Nerd Font:size=10" };
-/* static const char dmenufont[]       = "monospace:size=10"; */
-static const char col_gray1[]       = "#000000";
-static const char col_gray2[]       = "#444444";
-static const char col_gray3[]       = "#bbbbbb";
-static const char col_gray4[]       = "#000000";
-static const char col_cyan[]        = "#92E5CF";
-static const char *colors[][3]      = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_cyan,  col_gray4,  col_cyan  },
+static const char *fonts[]          = { "Cascadia Code:size=10", "mononoki Nerd Font:size=10" };
+static const char dmenufont[]       = "Cascadia Code:size=10";
+static char normbgcolor[]           = "#222222";
+static char normbordercolor[]       = "#444444";
+static char normfgcolor[]           = "#bbbbbb";
+static char selfgcolor[]            = "#eeeeee";
+static char selbordercolor[]        = "#005577";
+static char selbgcolor[]            = "#005577";
+static char *colors[][3] = {
+       /*               fg           bg           border   */
+       [SchemeNorm] = { normfgcolor, normbgcolor, normbordercolor },
+       [SchemeSel]  = { selfgcolor,  selbgcolor,  selbordercolor  },
 };
 
 /* tagging */
@@ -32,13 +32,13 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class          instance          title      tags mask        iscentered   isfloating   monitor */
-  { "Gimp",           NULL,             NULL,       0,              0,           1,           -1 },
-  { "Brave-browser",  NULL,             NULL,       1 << 0,         0,           0,           -1 },
-  { "Zathura",        NULL,             NULL,       1 << 1,         0,           0,           -1 },
-  { "Alacritty",      NULL,             NULL,       1 << 2,         0,           0,           -1 },
-  { "Emacs",          NULL,             NULL,       1 << 3,         0,           0,           -1 },
-  { "Rust",           NULL,             NULL,       0,              1,           1,           -1 },
+	/* class          instance          title      tags mask        switchtotag     iscentered   isfloating   monitor */
+  { "Gimp",           NULL,             NULL,       0,              0,              0,           1,           -1 },
+  { "Brave-browser",  NULL,             NULL,       1 << 0,         1,              0,           0,           -1 },
+  { "Zathura",        NULL,             NULL,       1 << 1,         1,              0,           0,           -1 },
+  { "Alacritty",      NULL,             NULL,       1 << 2,         1,              0,           0,           -1 },
+  { "Emacs",          NULL,             NULL,       1 << 3,         1,              0,           0,           -1 },
+  { "Tk",             NULL,             NULL,       0,              0,              1,           1,           -1 },
 };
 
 /* layout(s) */
@@ -71,8 +71,8 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *brave[]        = { "brave", "--profile-directory", NULL };
-static const char *dmenucmd[]       = { "dmenu_run", NULL };
+static const char *brave[]          = { "brave", NULL };
+static const char *dmenucmd[]       = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbgcolor, "-sf", selfgcolor, NULL };
 static const char *termcmd[]        = { "alacritty", NULL };
 
 static Key keys[] = {
@@ -130,8 +130,7 @@ static Key keys[] = {
 	{ 0,                            XF86XK_MonBrightnessUp, spawn, SHCMD("xbacklight -inc 5") },
 	{ 0,                            XF86XK_MonBrightnessDown, spawn, SHCMD("xbacklight -dec 5") },
 	{ 0,                            XK_Print, spawn, SHCMD("flameshot gui") },
-    /* struggling to make the stuff below into a function that appends to the list but
-     * i am bad at C */
+	{ MODKEY,                       XK_F5,     xrdb,           {.v = NULL } },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
