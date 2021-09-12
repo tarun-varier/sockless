@@ -28,14 +28,14 @@ typedef struct {
 	const char *name;
 	const void *cmd;
 } Sp;
-const char *spcmd1[] = {"pomotroid", NULL };
+const char *spcmd1[] = { "alacritty", "-e", "ncspot", "-t", "ncspot", "-d", "0", "0" };
 static Sp scratchpads[] = {
 	/* name          cmd  */
-	{"pomotroid",    spcmd1},
+	{"ncspot",    spcmd1},
 };
 
 /* tagging */
-static const char *tags[] = { "爵", "", "", "華", "", "6", "7", "8", "9" };
+static const char *tags[] = { "爵", "", "", "華", "5", "6", "7", "8", "9" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -45,11 +45,12 @@ static const Rule rules[] = {
 	/* class          instance          title      tags mask        switchtotag     iscentered   isfloating   monitor */
   { "Gimp",           NULL,             NULL,       0,              0,              0,           1,           -1 },
   { "Brave-browser",  NULL,             NULL,       1 << 0,         1,              0,           0,           -1 },
+  { "Google-chrome",  NULL,             NULL,       1 << 8,         0,              0,           0,           -1 },
   { "Zathura",        NULL,             NULL,       1 << 1,         1,              0,           0,           -1 },
   { "Alacritty",      NULL,             NULL,       1 << 2,         1,              0,           0,           -1 },
   { "Emacs",          NULL,             NULL,       1 << 3,         1,              0,           0,           -1 },
   { "Tk",             NULL,             NULL,       0,              0,              1,           1,           -1 },
-  { NULL,		      "pomotroid",	    NULL,		SPTAG(0),		0,			    0,           0,           -1 },
+  { NULL,		      "ncspot",	        NULL,		SPTAG(0),		0,			    0,           0,           -1 },
 };
 
 /* layout(s) */
@@ -87,6 +88,8 @@ static const char *dmenucmd[]       = { "dmenu_run", "-m", dmenumon, "-fn", dmen
 static const char *termcmd[]        = { "alacritty", NULL };
 
 
+#include "selfrestart.c"
+
 static Key keys[] = {
 	/* modifier                     key           function        argument */
     /* program/script spawners */
@@ -98,19 +101,20 @@ static Key keys[] = {
     { MODKEY,                       XK_Page_Up,   spawn,          SHCMD("dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous") },
     { MODKEY,                       XK_w,         spawn,          {.v = brave } },
     { MODKEY,                       XK_Return,    spawn,          {.v = termcmd } },
-    { MODKEY,                       XK_s,         spawn,          SHCMD("spotify") },
     { MODKEY,                       XK_r,         spawn,          SHCMD("alacritty -e lf") },
     { MODKEY,                       XK_y,         spawn,          SHCMD("zathura /home/tarun/dl/school/11/time_table.pdf") },
     { MODKEY,                       XK_n,         spawn,          SHCMD(TERMINAL " -e nvim") },
     { MODKEY,                       XK_b,         togglebar,      {0} },
     { MODKEY,                       XK_e,         spawn,          SHCMD("emacs") },
     { MODKEY,                       XK_x,         spawn,          SHCMD("notify-send \"$(xprop | grep WM_CLASS)\"") },
-	{ MODKEY,            			XK_p,  	      togglescratch,  {.ui = 0 } },
+	{ MODKEY,            			XK_s,  	      togglescratch,  {.ui = 0 } },
 	{ MODKEY,            			XK_c,  	      spawn,          SHCMD("clipmenu") },
     { MODKEY|ShiftMask,             XK_p,         spawn,          SHCMD("passmenu2") },
     { MODKEY|ShiftMask,             XK_a,         spawn,          SHCMD("add-bm-dir") },
     { MODKEY|ShiftMask,             XK_m,         spawn,          SHCMD("medicine-alarm") },
     { MODKEY|ShiftMask,             XK_b,         spawn,          SHCMD("echo 'JetBrainsMonoMedium Nerd Font' | xclip -sel clip") },
+    { MODKEY|ShiftMask,             XK_k,         spawn,          SHCMD("killmenu") },
+    { MODKEY|ShiftMask,             XK_r,         spawn,          SHCMD("alacritty -e recompile-dwm") },
     /* Layouts */
 	{ MODKEY,                       XK_t,         setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_f,         setlayout,      {.v = &layouts[2]} },
@@ -119,6 +123,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_o,         setlayout,      {.v = &layouts[4]} },
 	{ MODKEY,                       XK_z,         setlayout,      {.v = &layouts[5]} },
     { MODKEY|ShiftMask,             XK_l,         spawn,          SHCMD("listlayouts") },
+	{ MODKEY|Mod1Mask,              XK_j,         aspectresize,   {.i = +24} },
+	{ MODKEY|Mod1Mask,              XK_k,         aspectresize,   {.i = -24} },
 	{ MODKEY,                       XK_j,         focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,         focusstack,     {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_i,         incnmaster,     {.i = +1 } },
@@ -138,6 +144,10 @@ static Key keys[] = {
 	{ MODKEY,                       XK_minus,     setgaps,        {.i = -1 } },
 	{ MODKEY,                       XK_equal,     setgaps,        {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_equal,     setgaps,        {.i = 0  } },
+	/* { Mod1Mask,                            XK_F1,        spawn,          SHCMD("pomo pause; kill -41 $(pidof dwmblocks)") }, */
+	/* { Mod1Mask,                            XK_F2,        spawn,          SHCMD("pomo start; kill -41 $(pidof dwmblocks)") }, */
+	/* { Mod1Mask,                            XK_F3,        spawn,          SHCMD("kill -41 $(pidof dwmblocks)") }, */
+	/* { Mod1Mask,                            XK_F4,        spawn,          SHCMD("pomo stop; kill -41 $(pidof dwmblocks)") }, */
     /* bunch of XF86 keys coz i got a bunch of em */
 	{ 0,                            XF86XK_AudioLowerVolume, spawn, SHCMD("pamixer --allow-boost -d 5; kill -36 $(pidof dwmblocks);") },
 	{ 0,                            XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -36 $(pidof dwmblocks)") },
@@ -155,6 +165,7 @@ static Key keys[] = {
 	TAGKEYS(                        XK_7,                      6)
 	TAGKEYS(                        XK_8,                      7)
 	TAGKEYS(                        XK_9,                      8)
+    { MODKEY|ShiftMask,             XK_r,      self_restart,   {0} },
 	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
 };
 
@@ -179,4 +190,3 @@ static Button buttons[] = {
 	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
 };
-

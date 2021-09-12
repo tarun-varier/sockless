@@ -1,0 +1,23 @@
+--- dmenu.c	2020-05-24 00:27:58.038586112 +0200
++++ dmenu.c	2019-02-02 13:55:02.000000000 +0100
+@@ -715,15 +670,15 @@ main(int argc, char *argv[])
+ 		else if (!strcmp(argv[i], "-p"))   /* adds prompt to left of input field */
+ 			prompt = argv[++i];
+ 		else if (!strcmp(argv[i], "-fn"))  /* font or font set */
+-			tempfonts = argv[++i];
++			fonts[0] = argv[++i];
+ 		else if (!strcmp(argv[i], "-nb"))  /* normal background color */
+-			colortemp[0] = argv[++i];
++			colors[SchemeNorm][ColBg] = argv[++i];
+ 		else if (!strcmp(argv[i], "-nf"))  /* normal foreground color */
+-			colortemp[1] = argv[++i];
++			colors[SchemeNorm][ColFg] = argv[++i];
+ 		else if (!strcmp(argv[i], "-sb"))  /* selected background color */
+-			colortemp[2] = argv[++i];
++			colors[SchemeSel][ColBg] = argv[++i];
+ 		else if (!strcmp(argv[i], "-sf"))  /* selected foreground color */
+-			colortemp[3] = argv[++i];
++			colors[SchemeSel][ColFg] = argv[++i];
+ 		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
+ 			embed = argv[++i];
+ 		else
